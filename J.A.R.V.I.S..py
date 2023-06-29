@@ -25,7 +25,7 @@ def command():
         r.adjust_for_ambient_noise(source, duration=1)
         audio = r.listen(source)
         try:
-            task = r.recognize_google(audio, language="ua-UA").lower()
+            task = r.recognize_google(audio, language="en-EN").lower()
             print("Ви проговорили: " + task)
         except sr.UnknownValueError:
             talk("Я вас не зрозумів")
@@ -33,7 +33,7 @@ def command():
         return task
 
 def make_something(task):
-    if "відкрий сайт" in task:
+    if "open site" in task:
         talk("Відкриваю")
         url = "https://ituniver.com"
         webbrowser.open(url)
