@@ -19,32 +19,39 @@ def handle_input(user_input):
     return completion
 
 
+take = input("Який тип помычника ти хочеш? Обери голосовий (1) чи письмовий (2)")
 
 def talk(words):
     print(words)
-    engine = pyttsx3.init()
-    engine.say(words)
-    engine.runAndWait()
-    # os.system("say " + words)
+
+    if take == "1":
+        engine = pyttsx3.init()
+        engine.say(words)
+        engine.runAndWait()
+        #os.system("say " + words)
 
 
 talk("Hi, how can I help you?")
 
 
 def command():
-    r = sr.Recognizer()
-    with sr.Microphone() as source:
-        print("Say")
-        r.pause_threshold = 1
-        r.adjust_for_ambient_noise(source, duration=1)
-        audio = r.listen(source)
-        try:
-            # task = r.recognize_google(audio, language="en-EN").lower()
-            task = r.recognize_google(audio, language="uk-UA").lower()
-            print("Ви проговорили: " + task)
-        except sr.UnknownValueError:
-            talk("Я вас не зрозумів")
-            task = command()
+    if take == "2":
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            print("Say")
+            r.pause_threshold = 1
+            r.adjust_for_ambient_noise(source, duration=1)
+            audio = r.listen(source)
+            try:
+                # task = r.recognize_google(audio, language="en-EN").lower()
+                task = r.recognize_google(audio, language="uk-UA").lower()
+                print("Ви проговорили: " + task)
+            except sr.UnknownValueError:
+                talk("Я вас не зрозумів")
+                task = command()
+    else:
+        task = input("Your task: ")
+
         return task
 
 def make_something(task):
@@ -60,8 +67,18 @@ def make_something(task):
         sys.exit()
 
     else:
-        ai_response = handle_input(task).choices[0].message.content
-        talk(ai_response)
+        try:
+            ai_response = handle_input(task).choices[0].message.content
+            talk(ai_response)
+
+        except openai.error.ServiceUnavailableError:
+            talk("Sorry, I going to try again")
+            try :
+                ai_response = handle_input(task).choices[0].message.content
+                talk(ai_response)
+            except openai.error.ServiceUnavailableError:
+                talk("Sorry, can you say me this task again or give me new task ")
+
 
 while True:
     make_something(command())
